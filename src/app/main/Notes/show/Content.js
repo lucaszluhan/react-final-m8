@@ -11,7 +11,7 @@ import { showMessage } from 'app/store/fuse/messageSlice';
 
 import objectsKeysEquals from 'app/utils/validations/objectsKeysEquals';
 import ButtonDefault from 'app/fuse-layouts/shared-components/button-default/ButtonDeafault';
-import { Grid, InputAdornment } from '@mui/material';
+import { Button, Grid, InputAdornment } from '@mui/material';
 
 import {
     saveOne,
@@ -20,7 +20,9 @@ import {
     updateOne,
     updateResponse,
     updateLoading,
+    deleteOne,
 } from '../store/noteSlice';
+import { getAll } from '../store/notesSlice';
 
 function Content() {
     const dispatch = useDispatch();
@@ -46,6 +48,13 @@ function Content() {
 
         updateState();
     }, [dispatch, routeParams]);
+
+    useEffect(() => {
+        const { id } = routeParams;
+        if (id === 'new') {
+            document.getElementById('deleteB').style.display = 'none';
+        }
+    }, []);
 
     useEffect(() => {
         if (noteRedux) {
@@ -98,7 +107,7 @@ function Content() {
 
             clear();
         }
-    }, [noteRedux.success, noteRedux.message]);
+    }, [noteRedux.message, noteRedux.success]);
 
     function canBeSubmitted(modal) {
         if (modal) {
@@ -109,8 +118,7 @@ function Content() {
             } else {
                 diff = objectsKeysEquals(modal, noteRedux);
             }
-            const diffContents =
-                noteRedux?.contents?.length !== selectedContents.length;
+            const diffContents = noteRedux?.contents?.length !== selectedContents.length;
 
             if ((diff || diffContents) && !isFormValid) {
                 setIsFormValid(true);
@@ -120,24 +128,31 @@ function Content() {
                 setIsFormValid(false);
             }
 
-            if (
-                (diff && !diffContents) ||
-                (!diff && diffContents && !isFormValid)
-            ) {
+            if ((diff && !diffContents) || (!diff && diffContents && !isFormValid)) {
                 setIsFormValid(true);
             }
         }
     }
 
-    function handleSubmit(modal) {
+    async function handleSubmit(modal) {
         setLoading(true);
         dispatch(updateLoading(true));
 
-        if (noteRedux?.id !== 'new') {
-            dispatch(updateOne({ data: modal, id: noteRedux?.id }));
+        if (noteRedux?.uid !== 'new') {
+            await dispatch(updateOne({ data: modal, id: noteRedux?.uid }));
         } else {
-            dispatch(saveOne(modal));
+            await dispatch(saveOne(modal));
         }
+        navigate('/notes');
+    }
+
+    async function handleDelete() {
+        setLoading(true);
+        dispatch(updateLoading(true));
+
+        await dispatch(deleteOne(noteRedux.uid));
+
+        navigate('/notes');
     }
 
     function handleSelect(value) {
@@ -151,7 +166,7 @@ function Content() {
         setIsFormValid(true);
     }
 
-    if (!noteRedux?.id && loading) {
+    if (!noteRedux?.uid && loading) {
         return <FuseLoading />;
     }
 
@@ -168,7 +183,7 @@ function Content() {
                         className="mb-16 w-full"
                         label="Nome"
                         type="text"
-                        name="title"
+                        name="detail"
                         value={noteRedux.detail}
                         variant="outlined"
                         validations={{ minLength: 3 }}
@@ -221,11 +236,13 @@ function Content() {
                                 disabled={!isFormValid}
                             />
                             <ButtonDefault
+                                id="deleteB"
                                 fullWidth
-                                type="submit"
+                                type="button"
                                 title="Delete"
                                 loading={loading}
                                 disabled={!isFormValid}
+                                action={handleDelete}
                             />
                         </Grid>
                     </Grid>

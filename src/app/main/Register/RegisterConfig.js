@@ -1,10 +1,9 @@
 import React from 'react';
 import { authRoles } from 'app/auth';
 
-const Note = React.lazy(() => import('./show/Note'));
-const Notes = React.lazy(() => import('./list/Notes'));
+const Register = React.lazy(() => import('./show/Register'));
 
-const NotesConfig = {
+const RegisterConfig = {
     settings: {
         layout: {
             config: {
@@ -28,18 +27,14 @@ const NotesConfig = {
             },
         },
     },
-    auth: authRoles.admin,
+    auth: authRoles.onlyGuest,
     routes: [
         {
-            path: '/notes/:id',
-            element: <Note />,
-        },
-        {
-            path: '/notes',
+            path: '/register',
             exact: true,
-            element: <Notes />,
+            element: <Register />,
         },
     ],
 };
 
-export default NotesConfig;
+export default RegisterConfig;

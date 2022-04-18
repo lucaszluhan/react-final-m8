@@ -4,9 +4,10 @@ import ExampleConfig from 'app/main/example/ExampleConfig';
 import LoginConfig from 'app/main/login/LoginConfig';
 import NotesConfig from 'app/main/Notes/NotesConfig';
 import FuseLoading from '@fuse/core/FuseLoading';
+import RegisterConfig from 'app/main/Register/RegisterConfig';
 import Error404Page from 'app/main/404/Error404Page';
 
-const routeConfigs = [ExampleConfig, NotesConfig, LoginConfig];
+const routeConfigs = [ExampleConfig, NotesConfig, LoginConfig, RegisterConfig];
 
 const routes = [
     // if you want to make whole app auth protected by default change defaultAuth for example:
@@ -15,7 +16,7 @@ const routes = [
     ...FuseUtils.generateRoutesFromConfigs(routeConfigs, null),
     {
         path: '/',
-        element: <Navigate to="example" />,
+        element: <Navigate to="login" />,
     },
     {
         path: 'loading',

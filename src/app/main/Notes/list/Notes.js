@@ -10,7 +10,7 @@ import { getAll, selectAll } from '../store/notesSlice';
 
 const columns = [
     {
-        id: 'title',
+        id: 'detail',
         align: 'left',
         disablePadding: false,
         label: 'Título',
@@ -33,11 +33,11 @@ export default function Notes() {
     const [loading, setLoading] = useState(false);
 
     function handleClick(value) {
-        navigate(`/products/${value.id}`);
+        navigate(`/notes/${value.uid}`);
     }
 
     function handleClickNew() {
-        navigate(`/products/new`);
+        navigate(`/notes/new`);
     }
 
     useEffect(() => {
@@ -67,19 +67,9 @@ export default function Notes() {
                 header: 'min-h-72 h-72 sm:h-136 sm:min-h-136 white',
             }}
             header={
-                <PageCardedHeader
-                    title="Notas"
-                    buttonTitle="NOVO"
-                    buttonAction={handleClickNew}
-                />
+                <PageCardedHeader title="Notas" buttonTitle="NOVO" buttonAction={handleClickNew} />
             }
-            content={
-                <TableComponent
-                    columns={columns}
-                    data={data}
-                    action={handleClick}
-                />
-            }
+            content={<TableComponent columns={columns} data={data} action={handleClick} />}
             innerScroll
         />
     );

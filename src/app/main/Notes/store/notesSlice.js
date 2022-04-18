@@ -1,24 +1,20 @@
-import {
-    createSlice,
-    createAsyncThunk,
-    createEntityAdapter,
-} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import ApiService from 'app/services/api';
+// import { useSelector } from 'react-redux';
 
-export const getAll = createAsyncThunk('notes/getNotes', async () => {
-    const response = await ApiService.doGet(`/notes`);
-    const data = await response.data;
+export const getAll = createAsyncThunk('notes/getNotes', async (_, { getState, dispatch }) => {
+    const user = getState().auth;
+    const response = await ApiService.doGet(`/notes/${user.user.uid}`);
+    const { data } = response;
 
-    return data.notes;
+    return data;
 });
 
 const adapter = createEntityAdapter({
-    selectId: (note) => note.id,
+    selectId: (note) => note.uid,
 });
 
-export const { selectAll, selectById } = adapter.getSelectors(
-    (state) => state.notes
-);
+export const { selectAll, selectById } = adapter.getSelectors((state) => state.notes);
 
 const notesSlice = createSlice({
     name: 'notes',

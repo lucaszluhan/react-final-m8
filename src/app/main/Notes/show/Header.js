@@ -14,13 +14,7 @@ function Header() {
         }
     }, [noteRedux]);
 
-    return (
-        <PageCardedHeader
-            link="/notes"
-            title={note?.title || 'Nova nota'}
-            textBack="Notas"
-        />
-    );
+    return <PageCardedHeader link="/notes" title={note?.detail || 'Nova nota'} textBack="Notas" />;
 }
 
 export default Header;

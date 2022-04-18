@@ -2,63 +2,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import ApiService from 'app/services/api/';
 
-export const getOne = createAsyncThunk(
-    'note/getOne',
-    async (id, { dispatch }) => {
-        const response = await ApiService.doGet(`/notes/${id}`);
-        if (!response.success) {
-            return response.data;
-        }
-        const { note } = await response.data;
+export const getOne = createAsyncThunk('note/getOne', async (id, { getState, dispatch }) => {
+    const state = getState().notes;
+    const note = state.entities[id];
 
-        return { ...note };
-    }
-);
+    return note;
+});
 
-export const saveOne = createAsyncThunk(
-    'note/saveOne',
-    async (data, { dispatch }) => {
-        const request = { ...data };
+export const saveOne = createAsyncThunk('note/saveOne', async (data, { getState, dispatch }) => {
+    const user = getState().auth;
+    const request = { ...data };
 
-        const response = await ApiService.doPost('/notes', request);
-        if (!response.success) {
-            dispatch(updateResponse(response.data));
-            return data;
-        }
-        const { note } = await response.data;
+    const response = await ApiService.doPost(`/notes/${user.user.uid}`, request);
 
-        dispatch(getOne(note.id));
-
-        return {
-            ...data,
-            message: response.message,
-            success: response.success,
-        };
-    }
-);
+    return {
+        ...data,
+    };
+});
 
 export const updateOne = createAsyncThunk(
     'note/updateOne',
-    async ({ data, id, userId }, { dispatch, getState }) => {
+    async ({ data, id }, { dispatch, getState }) => {
+        const user = getState().auth;
         const request = { ...data };
 
-        const response = await ApiService.doPut(`/notes/${id}`, request);
-        const oldState = getState().note;
-
-        if (!response.success) {
-            dispatch(updateResponse(response.data));
-            return { ...data, id, userId, loading: false };
-        }
-
-        dispatch(getOne(id));
+        await ApiService.doPut(`/notes/${id}/${user.user.uid}`, request);
 
         return {
-            ...oldState,
-            message: response.message,
-            success: response.success,
+            ...data,
         };
     }
 );
+
+export const deleteOne = createAsyncThunk('note/deleteOne', async (id, { getState }) => {
+    const user = getState().auth;
+    await ApiService.doDelete(`/notes/${id}/${user.user.uid}`);
+});
 
 const initialState = {
     success: false,
@@ -77,8 +56,8 @@ const noteSlice = createSlice({
             reducer: (state, action) => action.payload,
             prepare: (event) => ({
                 payload: {
-                    id: 'new',
-                    title: '',
+                    uid: 'new',
+                    detail: '',
                     description: '',
                     success: false,
                     loading: false,

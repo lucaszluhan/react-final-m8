@@ -4,6 +4,11 @@ import jwtDecode from 'jwt-decode';
 /* eslint-disable camelcase */
 
 class Api extends FuseUtils.EventEmitter {
+    constructor() {
+        super();
+        this.init();
+    }
+
     init() {
         this.setBaseUrl();
         this.setInterceptors();
@@ -11,8 +16,7 @@ class Api extends FuseUtils.EventEmitter {
     }
 
     setBaseUrl = () => {
-        axios.defaults.baseURL =
-            'https://git.heroku.com/react-final-back-m8.git';
+        axios.defaults.baseURL = 'https://react-final-back-m8.herokuapp.com/';
     };
 
     setInterceptors = () => {
@@ -71,14 +75,9 @@ class Api extends FuseUtils.EventEmitter {
     doGet = async (url) => {
         try {
             const response = await axios.get(url);
-
-            if (response.data.success === true) {
-                return response.data;
-            }
-
-            return 'ERRO';
+            return response.data;
         } catch (error) {
-            return error.response;
+            return error;
         }
     };
 
@@ -86,11 +85,7 @@ class Api extends FuseUtils.EventEmitter {
         try {
             const response = await axios.post(url, data);
 
-            if (response.data.success === true) {
-                return response.data;
-            }
-
-            return 'erro';
+            return response.data;
         } catch (error) {
             return { data: error.response.data, status: error.response.status };
         }
@@ -100,11 +95,7 @@ class Api extends FuseUtils.EventEmitter {
         try {
             const response = await axios.put(url, data);
 
-            if (response.data.success === true) {
-                return response.data;
-            }
-
-            return 'erro';
+            return response;
         } catch (error) {
             return { data: error.response.data, status: error.response.status };
         }
@@ -132,33 +123,27 @@ class Api extends FuseUtils.EventEmitter {
         try {
             const response = await axios.delete(url);
 
-            if (response.data.success === true) {
-                return response.data;
-            }
-
-            return 'erro';
+            return response;
         } catch (error) {
             return error.response;
         }
     };
 
-    signInWithEmailAndPassword = (email, password, remember) => {
+    signInWithEmailAndPassword = (username, password, remember) => {
         return new Promise((resolve, reject) => {
             axios
-                .post('/login', {
-                    login: email,
+                .post('/users/login', {
+                    name: username,
                     password,
                 })
                 .then((response) => {
-                    if (response.data.data.user) {
-                        if (remember) {
-                            this.setSaveSession(
-                                response.data.data.access_token
-                            );
-                        } else {
-                            this.setSession(response.data.data.access_token);
-                        }
-                        resolve(response.data.data.user);
+                    if (response.data.data) {
+                        // if (remember) {
+                        //     this.setSaveSession(response.data.data.access_token);
+                        // } else {
+                        //     this.setSession(response.data.data.access_token);
+                        // }
+                        resolve(response.data.data);
                     } else {
                         reject(response.data.error);
                     }
