@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom';
 import App from 'app/App';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
-import makeServer from './@server/mirage-server';
+// import makeServer from './@server/mirage-server';
 
 // if (process.env.NODE_ENV === 'development') {
 //     console.log('Start mirage-server...');
